@@ -1,0 +1,47 @@
+name: Publish FoundryVTT Package
+description: Publish a FoundryVTT package release through the Foundry Package Release API.
+
+branding:
+  icon: upload-cloud
+  color: orange
+
+inputs:
+  foundry-token:
+    description: FoundryVTT package release API token, including the fvttp_ prefix.
+    required: true
+  manifest-url:
+    description: URL to the versioned package manifest for this release.
+    required: true
+  release-version:
+    description: Release version to publish. Defaults to the manifest version.
+    required: false
+    default: ""
+  release-notes-url:
+    description: Release notes URL. Defaults to the manifest changelog URL when present.
+    required: false
+    default: ""
+  dry-run:
+    description: Validate the release with Foundry without saving it.
+    required: false
+    default: "false"
+
+outputs:
+  response-code:
+    description: HTTP response code returned by Foundry.
+    value: ${{ steps.publish.outputs.response-code }}
+  response-json:
+    description: Response body returned by Foundry.
+    value: ${{ steps.publish.outputs.response-json }}
+
+runs:
+  using: composite
+  steps:
+    - id: publish
+      shell: bash
+      env:
+        FOUNDRY_TOKEN: ${{ inputs.foundry-token }}
+        MANIFEST_URL: ${{ inputs.manifest-url }}
+        RELEASE_VERSION: ${{ inputs.release-version }}
+        RELEASE_NOTES_URL: ${{ inputs.release-notes-url }}
+        DRY_RUN: ${{ inputs.dry-run }}
+      run: '"${GITHUB_ACTION_PATH}/publish.sh"'

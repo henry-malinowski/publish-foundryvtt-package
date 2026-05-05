@@ -1,0 +1,43 @@
+# Auto-formatter for same-repo PRs. Skipped for forks because the bot can't
+# push to a fork branch — fork contributors run `make format` locally.
+#
+# Note: commits pushed by GITHUB_TOKEN do not trigger further workflow runs,
+# so the auto-format push will not re-run check.yml.
+
+name: Format
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Install shfmt
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends shfmt
+
+      - name: Format
+        run: make format
+
+      - name: Commit formatting changes
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Format shell scripts"
+          git push
