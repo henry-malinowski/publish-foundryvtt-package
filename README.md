@@ -16,17 +16,26 @@ on:
   release:
     types: [published]
 
+env:
+  release_manifest_url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+
 jobs:
-  foundry-release:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      # Build steps that attach a manifest to GitHub's Release.
 
+  publish-to-foundry:
+    runs-on: ubuntu-latest
+    needs: build
+    # workflow doesn't "Fail" on a Foundry-side hiccup; package Release is already done
+    continue-on-error: true
+    steps:
       - name: Publish FoundryVTT Package
         uses: henry-malinowski/publish-foundryvtt-package@v1
         with:
           foundry-token: ${{ secrets.FOUNDRY_TOKEN }}
-          manifest-url: https://github.com/OWNER/REPO/releases/download/${{ github.event.release.tag_name }}/module.json
+          manifest-url: ${{ env.release_manifest_url }}
           release-notes-url: ${{ github.event.release.html_url }}
 ```
 
