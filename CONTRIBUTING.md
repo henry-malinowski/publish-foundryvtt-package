@@ -24,6 +24,6 @@ Adding a test? See [`tests/README.md`](tests/README.md).
 
 Open a PR. A few things to expect:
 
-- Same-repo PRs may receive an automatic `Format shell scripts` commit. Expected; not personal.
+- Same-repo PRs may receive an automatic `Format shell scripts` commit.
 - On same-repo PRs, shellcheck findings appear twice — once as a failed check, once as inline review comments. Fork PRs see the same findings only in the `check.yml` logs (inline review comments require a write-scoped token that GitHub does not grant to fork PRs).
 - If you're contributing from a fork, formatting won't be auto-applied; run `make format` locally before pushing.
