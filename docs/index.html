@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Gate the scroll-reveal styles on JS before first paint, so the
+         reveal animation never causes a flash and JS-off users see all
+         content. Must stay inline + synchronous (not deferred) to beat paint. -->
+    <script>
+      document.documentElement.classList.add("js-reveal");
+    </script>
+    <title>Publish FoundryVTT Package Release — GitHub Action</title>
+    <meta
+      name="description"
+      content="A GitHub Action that registers each new release with FoundryVTT's official Package Release API — version, manifest, and compatibility — straight from your release workflow."
+    />
+
+    <link rel="icon" href="assets/upload-cloud.svg" type="image/svg+xml" />
+
+    <!-- Open Graph / Twitter social cards. Image generated from og/generate.html -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Publish FoundryVTT Package Release" />
+    <meta property="og:title" content="Publish FoundryVTT Package Release" />
+    <meta
+      property="og:description"
+      content="Registers each new release with FoundryVTT's official Package Release API — version, manifest, and compatibility — straight from your release workflow."
+    />
+    <meta
+      property="og:url"
+      content="https://henry-malinowski.github.io/publish-foundryvtt-package-release/"
+    />
+    <meta
+      property="og:image"
+      content="https://henry-malinowski.github.io/publish-foundryvtt-package-release/assets/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Publish to FoundryVTT, automatically — a GitHub Action that registers each new version with the Package Release API."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Publish FoundryVTT Package Release" />
+    <meta
+      name="twitter:description"
+      content="Registers each new version with FoundryVTT's official Package Release API, on every GitHub Release."
+    />
+    <meta
+      name="twitter:image"
+      content="https://henry-malinowski.github.io/publish-foundryvtt-package-release/assets/og-image.png"
+    />
+
+    <!-- Fonts: latin subset, limited to weights used by the docs. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800&amp;family=Iosevka+Charon+Mono&amp;subset=latin&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="hero">
+      <div class="wrap" data-reveal-stagger>
+        <!-- Inlined (not <img>) so reveal.js can draw the cloud perimeter and
+             lift the arrow into place. Mirrors assets/upload-cloud.svg, which is
+             still used as the favicon. Decorative — the <h1> carries meaning. -->
+        <svg
+          class="glyph"
+          width="56"
+          height="56"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#c2410c"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path class="glyph-cloud" d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+          <g class="glyph-arrow">
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+          </g>
+        </svg>
+        <h1 class="reveal-item">Publish to FoundryVTT, automatically</h1>
+        <p class="subhead reveal-item">
+          A GitHub Action that registers each new release with FoundryVTT's official
+          <a href="https://foundryvtt.com/article/package-release-api/">Package Release API</a>
+          — version, manifest, and compatibility — straight from your release workflow.
+        </p>
+
+        <div class="cta-row reveal-item">
+          <a
+            class="btn btn-primary"
+            href="https://github.com/henry-malinowski/publish-foundryvtt-package-release"
+            >Get it on GitHub</a
+          >
+          <!--
+            Marketplace CTA — uncomment once the action is listed:
+            <a class="btn btn-secondary"
+               href="https://github.com/marketplace/actions/publish-foundryvtt-package-release"
+              >View on Marketplace</a>
+          -->
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="wrap">
+      <section class="before-after" aria-labelledby="ba-heading">
+        <h2 id="ba-heading" class="reveal">The difference</h2>
+        <div class="ba-grid" data-reveal-stagger>
+          <div class="ba-card ba-before reveal-item">
+            <h3>By hand, every release</h3>
+            <ol>
+              <li>Open foundryvtt.com and sign in</li>
+              <li>Find your package, click edit</li>
+              <li>Paste the versioned manifest URL</li>
+              <li>Retype the version and compatibility</li>
+              <li>Submit — and repeat next time</li>
+            </ol>
+          </div>
+          <div class="ba-card ba-after reveal-item">
+            <h3>Wired up once</h3>
+            <ol class="checks">
+              <li>Tag and publish a GitHub Release</li>
+              <li>The action reads your manifest</li>
+              <li>It posts to the Package Release API</li>
+              <li>FoundryVTT records the new version</li>
+              <li>You walk away</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="setup reveal" aria-labelledby="setup-heading">
+        <h2 id="setup-heading">The entire setup</h2>
+
+        <!-- Toggle is hidden until JS activates it; with JS off, the single-job
+             snippet below is the visible default and the split one stays hidden,
+             so the page still shows one complete example. -->
+        <div class="snippet-toggle" role="tablist" aria-label="Workflow layout" hidden>
+          <button
+            type="button"
+            class="snippet-toggle__btn is-active"
+            role="tab"
+            aria-selected="true"
+            data-snippet-target="snippet-single"
+          >
+            Single job
+          </button>
+          <button
+            type="button"
+            class="snippet-toggle__btn"
+            role="tab"
+            aria-selected="false"
+            data-snippet-target="snippet-split"
+          >
+            Split build &amp; publish
+          </button>
+        </div>
+
+        <figure class="snippet">
+          <figcaption>
+            <span>.github/workflows/release.yml</span>
+            <button
+              type="button"
+              class="copy-btn"
+              data-copy-target="#snippet-single"
+              aria-live="polite"
+            >
+              <span class="copy-btn__label copy-btn__label--idle">Copy</span>
+              <span class="copy-btn__label copy-btn__label--done">Copied</span>
+            </button>
+          </figcaption>
+          <pre data-snippet="snippet-single"><code id="snippet-single" class="language-yaml">name: Release Foundry Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-to-foundry:
+    runs-on: ubuntu-latest
+    steps:
+      # Your build steps — produce module.json and attach it to the GitHub
+      # Release so Foundry clients can fetch it at install time.
+      - name: Publish FoundryVTT Package Release
+        uses: henry-malinowski/publish-foundryvtt-package-release@v1
+        with:
+          foundry-token: ${{ secrets.FOUNDRY_TOKEN }}
+          manifest-path: module.json
+          manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+          release-notes-url: ${{ github.event.release.html_url }}</code></pre>
+          <pre data-snippet="snippet-split" hidden><code id="snippet-split" class="language-yaml">name: Release Foundry Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Your build steps — produce module.json and attach it to the Release.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: foundry-manifest
+          path: module.json
+
+  publish-to-foundry:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # The manifest crosses the job boundary as an artifact you control;
+      # the action just reads the path you hand it.
+      - uses: actions/download-artifact@v8
+        with:
+          name: foundry-manifest
+          path: manifest
+      - name: Publish FoundryVTT Package Release
+        uses: henry-malinowski/publish-foundryvtt-package-release@v1
+        with:
+          foundry-token: ${{ secrets.FOUNDRY_TOKEN }}
+          manifest-path: manifest/module.json
+          manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/module.json
+          release-notes-url: ${{ github.event.release.html_url }}</code></pre>
+        </figure>
+      </section>
+
+      <section class="steps" aria-labelledby="steps-heading">
+        <h2 id="steps-heading" class="reveal">Three steps to wire it up</h2>
+        <ol class="step-list" data-reveal-stagger>
+          <li class="reveal-item">
+            <h3>Add a <code>FOUNDRY_TOKEN</code> secret</h3>
+            <p>
+              Grab a Package Release API token (it starts with <code>fvttp_</code>)
+              from your package's edit page on foundryvtt.com, then add it as a
+              repository secret named <code>FOUNDRY_TOKEN</code>.
+            </p>
+          </li>
+          <li class="reveal-item">
+            <h3>Add the publish step to your release workflow</h3>
+            <p>
+              Adapt the workflow above, or drop the publish step into your
+              existing release job. Point <code>manifest-path</code> at the
+              manifest file your build produced, and <code>manifest-url</code> at
+              that same file's public Release-asset URL.
+            </p>
+          </li>
+          <li class="reveal-item">
+            <h3>Publish a GitHub Release</h3>
+            <p>
+              That's the trigger. The action validates your manifest and
+              publishes the version to FoundryVTT automatically.
+            </p>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <nav aria-label="Resources">
+          <a href="https://github.com/henry-malinowski/publish-foundryvtt-package-release#readme"
+            >Full documentation</a
+          >
+          <a href="https://foundryvtt.com/article/package-release-api/"
+            >Package Release API</a
+          >
+          <a href="https://github.com/henry-malinowski/publish-foundryvtt-package-release/blob/main/LICENSE"
+            >Apache-2.0</a
+          >
+        </nav>
+      </div>
+    </footer>
+
+    <script type="module" src="js/docs.js"></script>
+  </body>
+</html>

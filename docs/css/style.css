@@ -1,0 +1,609 @@
+/* Publish FoundryVTT Package Release — landing page
+   Neutral-clean, no gradients. Palette is one accent (echoing action.yml's
+   branding.color: orange) plus neutrals; swap --accent to retheme. */
+
+:root {
+  --bg: #fbfbfa;
+  --surface: #ffffff;
+  --ink: #1a1a1a;
+  --ink-soft: #555555;
+  --line: #e4e4e1;
+  --accent: #c2410c;
+  --accent-ink: #ffffff;
+  /* darker lip + soft tinted ambient shadow give the primary button depth */
+  --accent-edge: color-mix(in srgb, var(--accent) 68%, #000);
+  --accent-shadow: color-mix(in srgb, var(--accent) 32%, transparent);
+
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "Iosevka Charon Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --maxw: 56rem;
+  --radius: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 800;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+
+  &:focus {
+    left: 1rem;
+    top: 1rem;
+    z-index: 10;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+}
+
+/* --- Hero --------------------------------------------------------------- */
+
+.hero {
+  border-bottom: 1px solid var(--line);
+  padding-block: clamp(3rem, 8vw, 5.5rem) clamp(2.5rem, 6vw, 4rem);
+  text-align: center;
+
+  & .glyph {
+    display: block;
+    margin-inline: auto;
+    margin-bottom: 1.25rem;
+  }
+
+  & h1 {
+    font-size: clamp(2rem, 5.5vw, 3rem);
+    margin: 0 auto 1rem;
+    max-width: 18ch;
+  }
+
+  & .subhead {
+    font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 auto 1.75rem;
+  }
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.12s ease,
+    filter 0.18s ease,
+    border-color 0.18s ease;
+
+  /* Raised at rest (see per-variant box-shadow), lifts on hover to invite the
+     click, and presses down on active. Depth is shadow-only — no gradients. */
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  &.btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow:
+      0 2px 0 var(--accent-edge),
+      0 3px 8px var(--accent-shadow);
+
+    &:hover {
+      filter: brightness(0.97);
+      box-shadow:
+        0 3px 0 var(--accent-edge),
+        0 9px 18px var(--accent-shadow);
+    }
+
+    &:active {
+      box-shadow:
+        0 1px 0 var(--accent-edge),
+        0 2px 4px var(--accent-shadow);
+    }
+  }
+
+  &.btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--line);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 2px 5px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      border-color: var(--ink-soft);
+      box-shadow:
+        0 2px 0 var(--line),
+        0 6px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    &:active {
+      box-shadow:
+        0 1px 0 var(--line),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+/* --- Snippet layout toggle ---------------------------------------------- */
+
+/* Segmented control above the snippet; revealed by snippet-toggle.js (starts
+   [hidden] so JS-off users just see the single-job default). */
+.snippet-toggle {
+  position: relative;
+  display: flex;
+  gap: 0.25rem;
+  width: max-content;
+  max-width: 48rem;
+  margin: 0 auto 0.75rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+
+  /* Sliding active indicator. Positioned + sized to the active button by
+     snippet-toggle.js (anime.js tweens it on switch); it sits behind the labels,
+     so the buttons stay transparent and just flip text colour. Created in JS, so
+     it only exists when the control is interactive (which is also the only time
+     the control is shown). */
+  & .snippet-toggle__thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    border-radius: 7px;
+    background: var(--accent);
+    pointer-events: none;
+  }
+
+  & .snippet-toggle__btn {
+    position: relative;
+    z-index: 1;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0.3rem 0.8rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--ink-soft);
+    transition: color 0.15s ease;
+  }
+
+  & .snippet-toggle__btn.is-active {
+    color: var(--accent-ink);
+  }
+
+  & .snippet-toggle__btn:not(.is-active):hover {
+    color: var(--ink);
+  }
+}
+
+/* --- Code snippet ------------------------------------------------------- */
+
+.snippet {
+  margin: 0 auto;
+  max-width: 48rem;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+
+  & figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem 0.5rem 1rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  & pre {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    tab-size: 2;
+  }
+
+  & code {
+    font-size: inherit;
+  }
+}
+
+.copy-btn {
+  flex: none;
+  /* Stack both labels in one grid cell so the button is always as wide as the
+     longest ("Copied") and never reflows when the state flips. */
+  display: inline-grid;
+  place-items: center;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s ease;
+
+  & .copy-btn__label {
+    grid-area: 1 / 1;
+  }
+
+  /* idle: "Copy" shows, "Copied" is an invisible sizer (also out of the a11y
+     tree via visibility:hidden). The .copied state swaps which one is shown. */
+  & .copy-btn__label--done {
+    visibility: hidden;
+  }
+
+  &:active {
+    transform: translateY(1px) scale(0.97);
+  }
+
+  &.copied {
+    border-color: var(--accent);
+    color: var(--accent);
+    animation: copy-bump 0.18s ease;
+
+    & .copy-btn__label--idle {
+      visibility: hidden;
+    }
+
+    & .copy-btn__label--done {
+      visibility: visible;
+    }
+  }
+}
+
+@keyframes copy-bump {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* highlight.js tokens, palette-aligned (no stock theme): keys in the accent,
+   comments muted, everything else stays ink. Scoped to .snippet so it can't
+   leak. If the library fails to load, the <pre> just shows plain YAML. */
+.snippet {
+  & .hljs {
+    color: var(--ink);
+    background: transparent;
+  }
+
+  & .hljs-comment,
+  & .hljs-quote {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  & .hljs-attr,
+  & .hljs-attribute {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  & .hljs-string {
+    color: var(--ink);
+  }
+
+  & .hljs-bullet,
+  & .hljs-meta,
+  & .hljs-literal,
+  & .hljs-number,
+  & .hljs-type {
+    color: var(--ink-soft);
+  }
+}
+
+/* --- Before / After ----------------------------------------------------- */
+
+main {
+  padding-block: clamp(2.5rem, 6vw, 4rem);
+}
+
+section + section {
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.ba-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 40rem) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.ba-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+
+  & h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  & ol {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--ink-soft);
+
+    & li {
+      margin-bottom: 0.4rem;
+    }
+  }
+
+  &.ba-after .checks {
+    list-style: none;
+    padding-left: 0;
+
+    & li {
+      padding-left: 1.6rem;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0.1rem;
+        top: 0.55em;
+        width: 0.7rem;
+        height: 0.35rem;
+        border-left: 2px solid var(--accent);
+        border-bottom: 2px solid var(--accent);
+        transform: rotate(-45deg);
+      }
+    }
+  }
+}
+
+/* --- Steps -------------------------------------------------------------- */
+
+.step-list {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+
+  & > li {
+    counter-increment: step;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem 1.25rem 3.75rem;
+    position: relative;
+
+    &::before {
+      content: counter(step);
+      position: absolute;
+      left: 1.25rem;
+      top: 1.25rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    & h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.1rem;
+    }
+
+    & p {
+      margin: 0;
+      color: var(--ink-soft);
+    }
+  }
+}
+
+/* --- Footer ------------------------------------------------------------- */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding-block: 2rem;
+  margin-top: clamp(3rem, 7vw, 5rem);
+
+  & nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.75rem;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+}
+
+/* --- Scroll reveal + parallax ------------------------------------------- */
+
+/* Reveal-on-scroll. The `js-reveal` gate is added to <html> by an inline head
+   script before paint, so these hidden-start styles only apply when JS is on —
+   with JS off, .reveal carries no styles and content renders normally. */
+/* Hidden-start for both single blocks (.reveal) and staggered group items
+   (.reveal-item, inside a [data-reveal-stagger] container). anime.js (reveal.js)
+   animates these in and, on completion, hands the resting state back to
+   `.is-visible` below and strips its own inline styles — so nothing lingers to
+   fight the scroll-driven hero parallax (which also animates the glyph's
+   transform). No CSS transition here: anime owns the motion. */
+.js-reveal .reveal,
+.js-reveal .reveal-item {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.js-reveal .reveal.is-visible,
+.js-reveal .reveal-item.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Hero glyph entrance (reveal.js): the cloud perimeter draws in and the arrow
+   lifts into place while fading up. Gated on `.js-reveal` so JS-off users get
+   the finished icon, and neutralised under reduced-motion below. The dash length
+   is a generous constant (the real path is shorter) used only to hide the stroke
+   before reveal.js measures the exact length — both states read as "undrawn", so
+   there's no flash on the swap. */
+.js-reveal .glyph-cloud {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.js-reveal .glyph-arrow {
+  opacity: 0.6;
+  transform: translateY(3px);
+}
+
+/* Subtle hero-glyph parallax, progressive enhancement only: silent under
+   reduced-motion and static on browsers without scroll-driven animations. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .hero .glyph {
+      animation: hero-parallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 60vh;
+    }
+
+    @keyframes hero-parallax {
+      to {
+        transform: translateY(28px);
+        opacity: 0.85;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .btn,
+  .copy-btn {
+    transition: none;
+  }
+
+  .btn:hover,
+  .btn:active,
+  .copy-btn:active {
+    transform: none;
+  }
+
+  .copy-btn.copied {
+    animation: none;
+  }
+
+  /* show revealed content immediately, no slide */
+  .js-reveal .reveal,
+  .js-reveal .reveal-item {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* glyph: skip the draw/lift, show the finished icon */
+  .js-reveal .glyph-cloud {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .js-reveal .glyph-arrow {
+    opacity: 1;
+    transform: none;
+  }
+}
