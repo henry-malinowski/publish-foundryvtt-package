@@ -1,18 +1,7 @@
 #!/usr/bin/env bash
-# Mock curl. Two roles by argv shape:
-#   --fail-with-body present  →  manifest fetch
-#   otherwise                 →  POST to Foundry; emits the next queued
-#                                response from MOCK_RESPONSE_PREFIX.
+# Mock curl. The action only shells out to curl for the POST to Foundry; it
+# emits the next queued response from MOCK_RESPONSE_PREFIX.
 set -Eeuo pipefail
-
-if [[ "$*" == *"--fail-with-body"* ]]; then
-  if [[ "${MOCK_MANIFEST_EXIT:-0}" -ne 0 ]]; then
-    printf '%s' "${MOCK_MANIFEST_ERROR:-manifest fetch failed}" >&2
-    exit "${MOCK_MANIFEST_EXIT}"
-  fi
-  cat "${MOCK_MANIFEST_FILE}"
-  exit 0
-fi
 
 body_file=
 write_out=

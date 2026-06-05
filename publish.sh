@@ -109,6 +109,7 @@ retry_after_seconds() {
 
 main() {
   local foundry_token=${FOUNDRY_TOKEN:-}
+  local manifest_path=${MANIFEST_PATH:-}
   local manifest_url=${MANIFEST_URL:-}
   local release_version=${RELEASE_VERSION:-}
   local release_notes_url=${RELEASE_NOTES_URL:-}
@@ -119,20 +120,18 @@ main() {
   local retry_count retry_after
 
   require_foundry_token "${foundry_token}"
+  require_input "manifest-path" "${manifest_path}"
   require_input "manifest-url" "${manifest_url}"
 
   dry_run_json=$(parse_bool "${dry_run}")
 
-  manifest_json=$(
-    curl \
-      --connect-timeout 10 \
-      --fail-with-body \
-      --location \
-      --max-time 60 \
-      --silent \
-      --show-error \
-      "${manifest_url}"
-  )
+  # The manifest bytes come from the local file the build produced; manifest-url
+  # is stored by Foundry and fetched by clients later, never dereferenced here.
+  [[ -f "${manifest_path}" ]] ||
+    die "manifest-path: no file at ${manifest_path} — did the build produce it?"
+  manifest_json=$(< "${manifest_path}")
+  jq empty <<< "${manifest_json}" 2> /dev/null ||
+    die "manifest-path: ${manifest_path} is not valid JSON (the package archive is not the manifest)"
 
   package_id=$(jq_string '.id' "Manifest is missing required .id" "${manifest_json}")
   manifest_version=$(jq_string '.version' "Manifest is missing required .version" "${manifest_json}")
