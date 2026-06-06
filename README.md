@@ -5,8 +5,8 @@ Composite GitHub Action that publishes a FoundryVTT package release via the offi
 ## Prerequisites
 
 - Your release workflow must produce the package manifest (`module.json`, `system.json`, or `world.json`) and attach it to the GitHub Release as an asset, so Foundry clients can fetch it at install time. The action itself does not fetch that asset. Rather, it reads the manifest from a local path you pass as `manifest-path` (the same file your build produced), and transmits the asset URL to FoundryVTT API as `manifest-url`.
-- The manifest must contain the fields Foundry requires for a release: `id`, `version`, `compatibility.minimum`, and `compatibility.verified`. `compatibility.maximum` and `changelog` (used as the default release-notes URL) are optional. This action will fails if a required field is missing.
-- A repository secret named containing a Package Release API token; these start with `fvttp_` and are managed on your package's edit page at `https://foundryvtt.com/packages/<your-package-id>/edit`.
+- The manifest must contain the fields Foundry requires for a release: `id`, `version`, `compatibility.minimum`, and `compatibility.verified`. `compatibility.maximum` and `changelog` (used as the default release-notes URL) are optional. This action fails if a required field is missing.
+- A repository secret containing a Package Release API token; these start with `fvttp_` and are managed on your package's edit page at `https://foundryvtt.com/packages/<your-package-id>/edit`.
 
 ## Usage
 
