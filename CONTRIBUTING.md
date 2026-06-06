@@ -13,10 +13,10 @@ Thanks for considering a contribution.
 ```sh
 make format       # apply shfmt formatting in-place
 make format-check # report formatting diff without applying
-make check        # shellcheck + test suite (the merge gate)
+make check        # shellcheck + format-check + test suite (the merge gate)
 ```
 
-CI auto-applies formatting on same-repo PRs, so running `make format` locally is optional but encouraged — fork PRs don't get the auto-format step.
+Formatting is enforced by the merge gate (`make check` runs `format-check`), so run `make format` before pushing — unformatted code fails CI.
 
 Adding a test? See [`tests/README.md`](tests/README.md).
 
@@ -24,6 +24,5 @@ Adding a test? See [`tests/README.md`](tests/README.md).
 
 Open a PR. A few things to expect:
 
-- Same-repo PRs may receive an automatic `Format shell scripts` commit.
+- `make check` is the gate: shellcheck, formatting, and the test suite must all pass. Run it locally before pushing.
 - On same-repo PRs, shellcheck findings appear twice — once as a failed check, once as inline review comments. Fork PRs see the same findings only in the `check.yml` logs (inline review comments require a write-scoped token that GitHub does not grant to fork PRs).
-- If you're contributing from a fork, formatting won't be auto-applied; run `make format` locally before pushing.

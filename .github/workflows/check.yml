@@ -1,4 +1,4 @@
-# Merge gate: runs `make check` (shellcheck + test suite) on:
+# Merge gate: runs `make check` (shellcheck + format-check + test suite) on:
 # - PRs
 # - pushes to main
 # - and v* tags
@@ -30,6 +30,11 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
+
+      - name: Install shfmt
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends shfmt
 
       - name: Check
         run: make check

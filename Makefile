@@ -17,4 +17,4 @@ test:
 pages-build:
 	bash docs/build.sh .tmp/pages
 
-check: lint test
+check: lint format-check test
