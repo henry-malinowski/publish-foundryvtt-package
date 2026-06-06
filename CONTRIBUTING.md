@@ -13,10 +13,17 @@ Thanks for considering a contribution.
 ```sh
 make format       # apply shfmt formatting in-place
 make format-check # report formatting diff without applying
-make check        # shellcheck + test suite (the merge gate)
+make check        # shellcheck + format-check + test suite (the merge gate)
 ```
 
-CI auto-applies formatting on same-repo PRs, so running `make format` locally is optional but encouraged — fork PRs don't get the auto-format step.
+Formatting is enforced by the merge gate (`make check` runs `format-check`), so run `make format` before pushing — unformatted code fails CI.
+
+`make check` covers the action's shell scripts and tests. The CI **workflow files** (`.github/workflows/*.yml`) are a separate concern, linted by [actionlint](https://github.com/rhysd/actionlint) — not by `make check`. Checking them locally is optional (CI gates them either way); to do so, install the binary and run it from the repo root:
+
+```sh
+go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12  # or: brew install actionlint
+actionlint
+```
 
 Adding a test? See [`tests/README.md`](tests/README.md).
 
@@ -24,6 +31,5 @@ Adding a test? See [`tests/README.md`](tests/README.md).
 
 Open a PR. A few things to expect:
 
-- Same-repo PRs may receive an automatic `Format shell scripts` commit. Expected; not personal.
-- On same-repo PRs, shellcheck findings appear twice — once as a failed check, once as inline review comments. Fork PRs see the same findings only in the `check.yml` logs (inline review comments require a write-scoped token that GitHub does not grant to fork PRs).
-- If you're contributing from a fork, formatting won't be auto-applied; run `make format` locally before pushing.
+- Two gates decide pass/fail: `make check` (shellcheck, formatting, the test suite) for the action's shell scripts, and `actionlint` for the workflow files. Run `make check` locally before pushing; workflow edits are gated in CI (or check them locally with `actionlint`).
+- On same-repo PRs you also get inline review comments on the diff — shellcheck and actionlint, via `review.yml`. These are **advisory**; the gates above are what block a merge. Fork PRs don't get inline comments (they need a write-scoped token GitHub withholds from forks), so fork contributors see findings in the gate logs instead.

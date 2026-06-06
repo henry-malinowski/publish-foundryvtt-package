@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Social card generator — Publish FoundryVTT Package Release</title>
+
+    <!-- Dev/build tool: renders the social cards below to exact-size PNGs.
+         Not linked from the site; produces the images used by the OG meta
+         tags and the GitHub repo social-preview setting. -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800&amp;family=Iosevka+Charon+Mono&amp;subset=latin&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #fbfbfa;
+        --ink: #1a1a1a;
+        --ink-soft: #555555;
+        --line: #e4e4e1;
+        --accent: #c2410c;
+        --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+        --font-mono: "Iosevka Charon Mono", ui-monospace, monospace;
+      }
+
+      body {
+        margin: 0;
+        background: #eceae6;
+        color: var(--ink);
+        font-family: var(--font-sans);
+        padding: 2rem;
+      }
+
+      .toolbar {
+        max-width: 1280px;
+        margin: 0 auto 1.5rem;
+
+        & h1 {
+          font-size: 1.25rem;
+          margin: 0 0 0.25rem;
+        }
+
+        & p {
+          margin: 0;
+          color: #555;
+          font-size: 0.95rem;
+        }
+      }
+
+      .card-block {
+        max-width: 1280px;
+        margin: 0 auto 2.5rem;
+
+        & .meta {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 0.6rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: #555;
+        }
+
+        & button {
+          font: inherit;
+          font-family: var(--font-sans);
+          font-weight: 700;
+          cursor: pointer;
+          padding: 0.4rem 0.9rem;
+          border-radius: 8px;
+          border: 1px solid var(--accent);
+          background: var(--accent);
+          color: #fff;
+
+          &:hover {
+            filter: brightness(0.92);
+          }
+        }
+      }
+
+      /* The capture targets. Exact pixel sizes; html2canvas renders at scale 1. */
+      .card {
+        position: relative;
+        box-sizing: border-box;
+        background: var(--bg);
+        color: var(--ink);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 34px;
+        padding: 72px 80px;
+
+        /* accent rule along the top edge */
+        &::before {
+          content: "";
+          position: absolute;
+          inset: 0 0 auto 0;
+          height: 10px;
+          background: var(--accent);
+        }
+      }
+
+      .card.og {
+        width: 1200px;
+        height: 630px;
+      }
+
+      .card.gh {
+        width: 1280px;
+        height: 640px;
+        /* GitHub crops the social preview differently across surfaces, so this
+           variant centers content and keeps a wide safe margin off the edges. */
+        text-align: center;
+        padding: 78px 140px;
+      }
+
+      .card.gh .top {
+        justify-content: center;
+      }
+
+      .card.gh .tagline {
+        margin-inline: auto;
+      }
+
+      .card .top {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+      }
+
+      .card .glyph {
+        width: 86px;
+        height: 86px;
+      }
+
+      .card .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 30px;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+        text-transform: uppercase;
+      }
+
+      .card h2 {
+        font-size: 94px;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        font-weight: 800;
+        margin: 0;
+        max-width: 16em;
+      }
+
+      .card .tagline {
+        font-size: 40px;
+        line-height: 1.35;
+        color: var(--ink-soft);
+        margin: 30px 0 0;
+        max-width: 22em;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <h1>Social card generator</h1>
+      <p>
+        Click a download button to export that card as an exact-size PNG, then
+        move it into <code>docs/assets/</code>. Cards are shown full size — scroll
+        as needed; the captured PNG matches what you see.
+      </p>
+    </div>
+
+    <!-- 1200x630 — og:image + Twitter summary_large_image -->
+    <div class="card-block">
+      <div class="meta">
+        <span>og-image.png — 1200&times;630 (Open Graph / Twitter)</span>
+        <button type="button" data-target="#og">Download 1200&times;630</button>
+      </div>
+      <div class="card og" id="og" data-w="1200" data-h="630" data-filename="og-image.png">
+        <div class="top">
+          <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+          </svg>
+          <span class="eyebrow">GitHub Action</span>
+        </div>
+        <div>
+          <h2>Publish to FoundryVTT, automatically</h2>
+          <p class="tagline">
+            Registers each new version with the official Package Release API.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1280x640 — GitHub repo Settings -> Social preview -->
+    <div class="card-block">
+      <div class="meta">
+        <span>github-social.png — 1280&times;640 (GitHub repo preview)</span>
+        <button type="button" data-target="#gh">Download 1280&times;640</button>
+      </div>
+      <div class="card gh" id="gh" data-w="1280" data-h="640" data-filename="github-social.png">
+        <div class="top">
+          <svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+          </svg>
+          <span class="eyebrow">GitHub Action</span>
+        </div>
+        <div>
+          <h2>Publish to FoundryVTT, automatically</h2>
+          <p class="tagline">
+            Registers each new version with the official Package Release API.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+      document.querySelectorAll(".card-block button").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const card = document.querySelector(btn.dataset.target);
+          const w = Number(card.dataset.w);
+          const h = Number(card.dataset.h);
+
+          btn.disabled = true;
+          const label = btn.textContent;
+          btn.textContent = "Rendering…";
+
+          // Fonts must be ready or html2canvas falls back to a system face.
+          await document.fonts.ready;
+
+          // scale: 1 forces 1:1 output regardless of the display's DPR, so the
+          // PNG is exactly w x h.
+          const canvas = await html2canvas(card, {
+            scale: 1,
+            width: w,
+            height: h,
+            backgroundColor: "#fbfbfa",
+          });
+
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = card.dataset.filename;
+          link.click();
+
+          btn.textContent = label;
+          btn.disabled = false;
+        });
+      });
+    </script>
+  </body>
+</html>

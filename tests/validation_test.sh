@@ -29,9 +29,13 @@ FOUNDRY_TOKEN='bad_token' run_publish bad-token-prefix || true
 assert_status bad-token-prefix "1" "bad token prefix fails validation"
 assert_no_api_call bad-token-prefix "bad token prefix should not call the API"
 
-MOCK_MANIFEST_EXIT=22 run_publish manifest-fetch-failure || true
-assert_nonzero "$(status_for manifest-fetch-failure)" "manifest fetch failure exits nonzero"
-assert_no_api_call manifest-fetch-failure "manifest fetch failure should not call the API"
+MANIFEST_PATH_OVERRIDE="${TEST_DIR}/does-not-exist.json" run_publish missing-manifest-file || true
+assert_status missing-manifest-file "1" "missing manifest file fails validation"
+assert_no_api_call missing-manifest-file "missing manifest file should not call the API"
+
+MANIFEST_RAW='not json' run_publish non-json-manifest || true
+assert_status non-json-manifest "1" "non-JSON manifest fails validation"
+assert_no_api_call non-json-manifest "non-JSON manifest should not call the API"
 
 MANIFEST_ID=null run_publish null-id || true
 assert_status null-id "1" "null manifest id fails validation"

@@ -69,13 +69,26 @@ run_publish() {
   local status_file="${TEST_DIR}/${name}-status.txt"
   local response_prefix="${TEST_DIR}/${name}-response-"
   local maximum=${MAXIMUM-}
+  local manifest_path
 
-  write_manifest "${manifest_file}" "${maximum}"
+  # Three byte-source modes for the local manifest the action reads:
+  #   MANIFEST_PATH_OVERRIDE — point at a caller-given path (e.g. a missing file)
+  #   MANIFEST_RAW           — write these raw bytes (e.g. non-JSON)
+  #   default                — a valid manifest via write_manifest
+  if [[ -n "${MANIFEST_PATH_OVERRIDE-}" ]]; then
+    manifest_path="${MANIFEST_PATH_OVERRIDE}"
+  elif [[ -n "${MANIFEST_RAW+x}" ]]; then
+    printf '%s' "${MANIFEST_RAW}" > "${manifest_file}"
+    manifest_path="${manifest_file}"
+  else
+    write_manifest "${manifest_file}" "${maximum}"
+    manifest_path="${manifest_file}"
+  fi
   stage_responses "${response_prefix}"
 
   (
     export PATH="${MOCK_DIR}:${PATH}"
-    export MOCK_MANIFEST_FILE="${manifest_file}"
+    export MANIFEST_PATH="${manifest_path}"
     export MOCK_HEADERS_FILE="${headers_file}"
     export MOCK_ATTEMPT_FILE="${attempt_file}"
     export MOCK_SLEEP_FILE="${sleep_file}"

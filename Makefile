@@ -1,4 +1,4 @@
-.PHONY: lint format format-check test check
+.PHONY: lint format format-check test pages-build check
 
 lint:
 	find . -type f -name '*.sh' -not -path './.git/*' -print0 | xargs -0 shellcheck
@@ -14,4 +14,7 @@ format-check:
 test:
 	find tests -maxdepth 1 -name '*_test.sh' -print0 | xargs -0 -n1 -P4 bash
 
-check: lint test
+pages-build:
+	bash docs/build.sh .tmp/pages
+
+check: lint format-check test

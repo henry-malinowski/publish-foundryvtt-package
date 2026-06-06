@@ -1,0 +1,57 @@
+# Advisory inline annotations on the PR diff via reviewdog: shellcheck for shell
+# scripts, actionlint for workflow files. Posts findings as review comments on
+# the changed lines.
+#
+# Advisory by design (`fail_level` left at its default of `none`): the merge
+# decision belongs to the gates -- check.yml for shellcheck/format/tests,
+# actionlint.yml for workflows. This layer only surfaces findings in context; it
+# never blocks. One authority per concern.
+#
+# Same-repo PRs only: reviewdog needs a write-scoped token to post review
+# comments, which GITHUB_TOKEN does not carry on fork pull_request events. Fork
+# contributors still see findings in the gates' logs.
+
+name: Review
+
+on:
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  shellcheck:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: ShellCheck
+        uses: reviewdog/action-shellcheck@4c07458293ac342d477251099501a718ae5ef86e # v1.32.0
+        with:
+          reporter: github-pr-review
+          path: "."
+          pattern: "*.sh"
+          check_all_files_with_shebangs: "true"
+          shellcheck_flags: "--external-sources --shell=bash"
+
+  actionlint:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: actionlint
+        # Bundles actionlint 1.7.12; SHA pin transitively pins that version.
+        uses: reviewdog/action-actionlint@6fb7acc99f4a1008869fa8a0f09cfca740837d9d # v1.72.0
+        with:
+          reporter: github-pr-review

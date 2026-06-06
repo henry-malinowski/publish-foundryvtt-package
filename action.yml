@@ -1,4 +1,4 @@
-name: Publish FoundryVTT Package
+name: Publish FoundryVTT Package Release
 description: Publish a FoundryVTT package release through the Foundry Package Release API.
 
 branding:
@@ -9,8 +9,11 @@ inputs:
   foundry-token:
     description: FoundryVTT package release API token, including the fvttp_ prefix.
     required: true
+  manifest-path:
+    description: Local path to the package manifest file the action reads and validates.
+    required: true
   manifest-url:
-    description: URL to the versioned package manifest for this release.
+    description: Public versioned manifest URL Foundry stores and clients fetch. Transmitted verbatim; never fetched by the action.
     required: true
   release-version:
     description: Release version to publish. Defaults to the manifest version.
@@ -40,6 +43,7 @@ runs:
       shell: bash
       env:
         FOUNDRY_TOKEN: ${{ inputs.foundry-token }}
+        MANIFEST_PATH: ${{ inputs.manifest-path }}
         MANIFEST_URL: ${{ inputs.manifest-url }}
         RELEASE_VERSION: ${{ inputs.release-version }}
         RELEASE_NOTES_URL: ${{ inputs.release-notes-url }}
