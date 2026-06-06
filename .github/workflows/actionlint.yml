@@ -1,0 +1,40 @@
+# Blocking gate for GitHub Actions workflow files. Runs actionlint over
+# .github/workflows/*.yml and fails on any finding.
+#
+# Separate from `make check` (check.yml), which gates the action's shell scripts
+# and tests -- workflow-config linting is its own concern. actionlint does not
+# lint action.yml.
+#
+# This is the authority: fork-safe (logs), whole-tree, required by branch
+# protection. Inline diff annotations are a separate, advisory layer in
+# review.yml.
+
+name: actionlint
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Lint workflows
+        # Pinned by image digest; bump digest + comment together on upgrade.
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 # 1.7.12
+        with:
+          args: -color
