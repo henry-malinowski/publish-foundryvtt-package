@@ -38,3 +38,40 @@ jobs:
 
       - name: Check
         run: make check
+
+  # Exercises the composite action end-to-end (action.yml -> publish.sh) with the
+  # Foundry POST mocked, so the inputs->env->script wiring is covered, not just
+  # publish.sh in isolation. CI-only by nature: it runs the real `uses: ./`.
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Stage mocked Foundry endpoint
+        run: bash tests/integration/stage.sh
+
+      - name: Run action under mock
+        id: publish
+        uses: ./
+        with:
+          foundry-token: fvttp_test
+          manifest-path: ${{ env.INTEGRATION_MANIFEST_PATH }}
+          manifest-url: https://example.test/module.json
+          dry-run: "true"
+
+      - name: Assert action outputs
+        env:
+          RESPONSE_CODE: ${{ steps.publish.outputs.response-code }}
+          RESPONSE_JSON: ${{ steps.publish.outputs.response-json }}
+        run: |
+          if [[ "${RESPONSE_CODE}" != "200" ]]; then
+            printf 'expected response-code 200, got %s\n' "${RESPONSE_CODE}" >&2
+            exit 1
+          fi
+          case "${RESPONSE_JSON}" in
+            *'"status"'*) printf 'action wiring OK: %s\n' "${RESPONSE_JSON}" ;;
+            *) printf 'response-json missing success body: %s\n' "${RESPONSE_JSON}" >&2; exit 1 ;;
+          esac
